@@ -3,9 +3,7 @@ package com.example.todolist;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,15 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.example.todolist.db.TaskContract;
-import com.example.todolist.db.TaskDbHelper;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ListView mTaskListView;
     private ArrayAdapter<String> mAdapter;
-    private TaskDbHelper mHelper;
     private static ArrayList<String> taskList = new ArrayList() {{
         add("Sample Task1");
         add("Sample Task2");
@@ -44,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTaskListView = (ListView) findViewById(R.id.list_todo);
-        mHelper = new TaskDbHelper(this);
         updateUI();
     }
 
@@ -68,13 +56,6 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String task = String.valueOf(taskEditText.getText());
-                                SQLiteDatabase db = mHelper.getWritableDatabase();
-                                ContentValues values = new ContentValues();
-                                values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
-                                db.insertWithOnConflict(TaskContract.TaskEntry.TABLE, null,
-                                        values,
-                                        SQLiteDatabase.CONFLICT_REPLACE);
-                                db.close();
                                 taskList.add(task);
                                 Log.d(TAG, "Task to add: " + task);
                                 Log.d(TAG, "Length in onclick: " + taskList.size());
@@ -106,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
             sb.append(s);
             sb.append(", ");
         }
-
         Log.d(TAG, "Length of the arrayList is: " + taskList.size());
         Log.d(TAG, sb.toString());
         if (mAdapter == null) {
